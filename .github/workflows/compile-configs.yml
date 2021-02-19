@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        board: ["BOARD_CREALITY_V4", "BOARD_CREALITY_V427"]
+        board: [BOARD_CREALITY_V4, BOARD_CREALITY_V427]
         grid: [3,5,7]
     steps:
     - uses: actions/checkout@v2
