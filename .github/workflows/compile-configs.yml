@@ -63,5 +63,5 @@ jobs:
         git config --global user.email 'github.actions@users.noreply.github.com'
         git add .
         git commit -am "New Precompiled Firmware"
-        git pull --rebase
+        git pull
         git push
