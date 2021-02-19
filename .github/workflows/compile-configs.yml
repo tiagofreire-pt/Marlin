@@ -47,7 +47,7 @@ jobs:
         sed -i "s/[^ ]*#define BLTOUCH_HS_MODE/$TEMP#define BLTOUCH_HS_MODE/g" Marlin/Configuration_adv.h
         pio run
         if ($HS); then TEMP=-HS; else TEMP=; fi;
-        mv .pio/build/STM32F103RET6_creality/*.bin Precompiled\ Firmware/BL-Touch/E3V2-BLTouch-$GRIDx$GRID$TEMP-$BOARD.bin
+        mv .pio/build/STM32F103RET6_creality/*.bin Precompiled\ Firmware/BL-Touch/E3V2-BLTouch-$GRID\x$GRID$TEMP-$BOARD.bin
       env:
         BOARD: ${{ matrix.board }}
         GRID: ${{ matrix.grid }}
@@ -63,5 +63,5 @@ jobs:
         git config --global user.email 'github.actions@users.noreply.github.com'
         git add .
         git commit -am "New Precompiled Firmware"
-        git pull
+        git pull --rebase
         git push
