@@ -38,6 +38,8 @@ jobs:
       run: |
         cp Configuration\ Files/E3V2\ Templates/$CONFIG/Configuration.h Marlin/Configuration.h
         cp Configuration\ Files/E3V2\ Templates/$CONFIG/Configuration_adv.h Marlin/Configuration_adv.h
+      env:
+        CONFIG: BLTouch-3x3
     - name: Run PlatformIO BL-Touch
       run: |
         pio run -e STM32F103RET6_creality_prebuild
