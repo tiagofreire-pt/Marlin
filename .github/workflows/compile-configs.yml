@@ -43,10 +43,10 @@ jobs:
       run: |
         sed -i "s/#define MOTHERBOARD.*/#define MOTHERBOARD BOARD_CREALITY_$BOARD/g" Marlin/Configuration.h
         sed -i "s/#define GRID_MAX_POINTS_X.*/#define GRID_MAX_POINTS_X $GRID/g" Marlin/Configuration.h
-        if ($HS); then TEMP=; else then TEMP=//; fi;
+        if ($HS); then TEMP=; else TEMP=//; fi;
         sed -i "s[^ ]*#define BLTOUCH_HS_MODE/$TEMP#define BLTOUCH_HS_MODE/g" Marlin/Configuration_adv.h
         pio run
-        if ($HS); then TEMP=-HS; else then TEMP=; fi;
+        if ($HS); then TEMP=-HS; else TEMP=; fi;
         mv .pio/build/STM32F103RET6_creality/*.bin Precompiled\ Firmware/BL-Touch/E3V2-BLTouch-$GRIDx$GRID$TEMP-$BOARD.bin
       env:
         BOARD: ${{ matrix.board }}
