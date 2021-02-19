@@ -3,12 +3,13 @@ name: PlatformIO CI
 on: [push]
 
 jobs:
-  build:
+  Build-BLTouch:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         board: [V4,V427]
-        grid: [3,5,7]
+        grid: [3,5]
+        highspeed: [true,false]
     steps:
     - uses: actions/checkout@v2
     - name: Cache pip
@@ -29,26 +30,28 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install --upgrade platformio
-    - name: backup config
+    - name: backup Configs
       run: |
         mkdir backup
         cp Marlin/Configuration.h backup/Configuration.h
         cp Marlin/Configuration_adv.h backup/Configuration_adv.h
-    - name: Copy BlTouch Configs
+    - name: Copy Configs
       run: |
-        cp Configuration\ Files/E3V2\ Templates/$CONFIG/Configuration.h Marlin/Configuration.h
-        cp Configuration\ Files/E3V2\ Templates/$CONFIG/Configuration_adv.h Marlin/Configuration_adv.h
-      env:
-        CONFIG: BLTouch-3x3
+        cp Configuration\ Files/E3V2\ Templates/BLTouch-3x3/Configuration.h Marlin/Configuration.h
+        cp Configuration\ Files/E3V2\ Templates/BLTouch-3x3/Configuration_adv.h Marlin/Configuration_adv.h
     - name: Run PlatformIO BL-Touch
       run: |
-        sed -i "s/#define MOTHERBOARD .*/#define MOTHERBOARD BOARD_CREALITY_$BOARD/g" Configuration\ Files/E3V2\ Templates/Testing/Configuration.h
+        sed -i "s/#define MOTHERBOARD.*/#define MOTHERBOARD BOARD_CREALITY_$BOARD/g" Marlin/Configuration.h
+        sed -i "s/#define GRID_MAX_POINTS_X.*/#define GRID_MAX_POINTS_X $GRID/g" Marlin/Configuration.h
+        if ($HS); then TEMP=; else then TEMP=//; fi;
+        sed -i "s[^ ]*#define BLTOUCH_HS_MODE/$TEMP#define BLTOUCH_HS_MODE/g" Marlin/Configuration_adv.h
         pio run
-        mv .pio/build/STM32F103RET6_creality/*.bin Precompiled\ Firmware/E3V2-$CONFIG-$BOARD-$GRID.bin
+        if ($HS); then TEMP=-HS; else then TEMP=; fi;
+        mv .pio/build/STM32F103RET6_creality/*.bin Precompiled\ Firmware/BL-Touch/E3V2-BLTouch-$GRIDx$GRID$TEMP-$BOARD.bin
       env:
-        CONFIG: BLTouch-3x3
         BOARD: ${{ matrix.board }}
         GRID: ${{ matrix.grid }}
+        HS: ${{ matrix.highspeed }}
     - name: Restore original config
       run: |
         mv backup/Configuration.h Marlin/Configuration.h 
@@ -60,4 +63,5 @@ jobs:
         git config --global user.email 'github.actions@users.noreply.github.com'
         git add .
         git commit -am "New Precompiled Firmware"
+        git pull
         git push
