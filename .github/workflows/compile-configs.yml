@@ -42,8 +42,8 @@ jobs:
         CONFIG: BLTouch-3x3
     - name: Run PlatformIO BL-Touch
       run: |
-        pio run -e STM32F103RET6_creality_prebuild
-        mv .pio/build/STM32F103RET6_creality_prebuild/*.bin Precompiled\ Firmware/E3V2-$CONFIG-$BOARD-$GRID.bin
+        pio run -e STM32F103RET6_creality
+        mv .pio/build/STM32F103RET6_creality/*.bin Precompiled\ Firmware/E3V2-$CONFIG-$BOARD-$GRID.bin
       env:
         CONFIG: BLTouch-3x3
         BOARD: ${{ matrix.board }}
