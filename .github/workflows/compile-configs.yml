@@ -64,5 +64,5 @@ jobs:
         git add .
         git commit -am "New Precompiled Firmware"
         git gc --prune=now
-        git pull
-        git push
+        git pull --rebase
+        git push -f
