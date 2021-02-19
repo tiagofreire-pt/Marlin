@@ -42,7 +42,7 @@ jobs:
         CONFIG: BLTouch-3x3
     - name: Run PlatformIO BL-Touch
       run: |
-        sed -i 's/#define MOTHERBOARD .*/#define MOTHERBOARD BOARD_CREALITY_${BOARD}/g' Configuration\ Files/E3V2\ Templates/Testing/Configuration.h
+        sed -i "s/#define MOTHERBOARD .*/#define MOTHERBOARD BOARD_CREALITY_$BOARD/g" Configuration\ Files/E3V2\ Templates/Testing/Configuration.h
         pio run
         mv .pio/build/STM32F103RET6_creality/*.bin Precompiled\ Firmware/E3V2-$CONFIG-$BOARD-$GRID.bin
       env:
