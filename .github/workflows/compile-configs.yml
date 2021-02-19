@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        board: [BOARD_CREALITY_V4, BOARD_CREALITY_V427]
+        board: [V4,V427]
         grid: [3,5,7]
     steps:
     - uses: actions/checkout@v2
@@ -42,7 +42,8 @@ jobs:
         CONFIG: BLTouch-3x3
     - name: Run PlatformIO BL-Touch
       run: |
-        pio run -e STM32F103RET6_creality
+        sed -i 's/#define MOTHERBOARD */#define MOTHERBOARD BOARD_CREALITY_$BOARD/g' Marlin/Configuration.h
+        pio run
         mv .pio/build/STM32F103RET6_creality/*.bin Precompiled\ Firmware/E3V2-$CONFIG-$BOARD-$GRID.bin
       env:
         CONFIG: BLTouch-3x3

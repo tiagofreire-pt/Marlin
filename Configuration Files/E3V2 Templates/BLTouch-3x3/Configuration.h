@@ -129,7 +129,7 @@
 
 // Choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD getenv("BOARD")
+  #define MOTHERBOARD BOARD_CREALITY_V4
 #endif
 
 // Name displayed in the LCD "Ready" message and Info menu
