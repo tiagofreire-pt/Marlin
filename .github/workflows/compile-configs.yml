@@ -43,10 +43,10 @@ jobs:
         if ($HS); then TEMP=; else TEMP='\/\/'; fi;
         sed -i "s/[^ ]*#define BLTOUCH_HS_MODE/$TEMP#define BLTOUCH_HS_MODE/g" Marlin/Configuration_adv.h
         pio run
-        if ($HS); then TEMP=-HS; else TEMP=; fi;
+        if ($HS); then TMP=-HS; else TMP=; fi;
         mkdir temp
         mv .pio/build/STM32F103RET6_creality/*.bin temp/build.bin
-        echo "::set-output name=filename::E3V2-BLTouch-$GRID\x$GRID$TEMP-$BOARD.bin"
+        echo "::set-output name=filename::E3V2-BLTouch-${GRID}x${GRID}${TMP}-${BOARD}.bin"
       env:
         BOARD: ${{ matrix.board }}
         GRID: ${{ matrix.grid }}
