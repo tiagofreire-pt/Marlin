@@ -52,7 +52,7 @@ jobs:
         GRID: ${{ matrix.grid }}
         HS: ${{ matrix.highspeed }}
     - name: Get release
-        id: get-release
+        id: get_release
         uses: bruceadams/get-release@v1.2.2
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -64,7 +64,7 @@ jobs:
           GRID: ${{ matrix.grid }}
           HS: ${{ matrix.highspeed }}
         with:
-          upload_url: ${{ steps.get-release.outputs.upload_url }}
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
           asset_path: temp/build.bin
           asset_name: E3V2-BLTouch-$GRID\x$GRID$TEMP-$BOARD.bin
           asset_content_type: application/x-binary
