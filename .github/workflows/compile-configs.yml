@@ -66,5 +66,5 @@ jobs:
       with:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: temp/build.bin
-        asset_name: E3V2-BLTouch-${GRID}\x${GRID}${TEMP}-${BOARD}.bin
+        asset_name: E3V2-BLTouch-env.GRID\xenv.GRIDenv.TEMP-env.BOARD.bin
         asset_content_type: application/x-binary
