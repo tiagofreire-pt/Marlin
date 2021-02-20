@@ -4,8 +4,6 @@ on:
   release:
     types: [created]
 
-  push:
-
 jobs:
   Build-BLTouch:
     name: Build BL-Touch Files
@@ -36,6 +34,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install --upgrade platformio
     - name: Run PlatformIO BL-Touch
+      id: build_configs
       run: |
         cp Configuration\ Files/E3V2\ Templates/BLTouch-3x3/Configuration.h Marlin/Configuration.h
         cp Configuration\ Files/E3V2\ Templates/BLTouch-3x3/Configuration_adv.h Marlin/Configuration_adv.h
@@ -47,6 +46,7 @@ jobs:
         if ($HS); then TEMP=-HS; else TEMP=; fi;
         mkdir temp
         mv .pio/build/STM32F103RET6_creality/*.bin temp/build.bin
+        echo '::set-output name=filename::E3V2-BLTouch-$GRID\x$GRID$TEMP-$BOARD.bin'
       env:
         BOARD: ${{ matrix.board }}
         GRID: ${{ matrix.grid }}
@@ -60,11 +60,8 @@ jobs:
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BOARD: ${{ matrix.board }}
-        GRID: ${{ matrix.grid }}
-        HS: ${{ matrix.highspeed }}
       with:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
         asset_path: temp/build.bin
-        asset_name: E3V2-BLTouch-${{ env.GRID }}\x${{ env.GRID }}${{ env.TEMP }}-${{ env.BOARD }}.bin
+        asset_name: ${{ steps.build_configs.outputs.filename }}
         asset_content_type: application/x-binary
