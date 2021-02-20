@@ -46,7 +46,7 @@ jobs:
         if ($HS); then TEMP=-HS; else TEMP=; fi;
         mkdir temp
         mv .pio/build/STM32F103RET6_creality/*.bin temp/build.bin
-        echo '::set-output name=filename::E3V2-BLTouch-$GRID\x$GRID$TEMP-$BOARD.bin'
+        echo "::set-output name=filename::E3V2-BLTouch-$GRID\x$GRID$TEMP-$BOARD.bin"
       env:
         BOARD: ${{ matrix.board }}
         GRID: ${{ matrix.grid }}
