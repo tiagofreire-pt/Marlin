@@ -4,6 +4,8 @@ on:
   release:
     types: [created]
 
+  push:
+
 jobs:
   Build-BLTouch:
     name: Build BL-Touch Files
