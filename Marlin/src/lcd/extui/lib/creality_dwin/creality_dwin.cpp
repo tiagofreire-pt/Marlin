@@ -80,7 +80,7 @@
 
 #define CORP_WEBSITE_E "github.com/Jyers"
 
-#define BUILD_NUMBER "1.1"
+#define BUILD_NUMBER "1.1.1"
 
 #define DWIN_FONT_MENU font8x16
 #define DWIN_FONT_STAT font10x20
@@ -156,7 +156,7 @@ bool printing = false;
 bool paused = false;
 bool sdprint = false;
 
-int16_t pausetemp, pausebed;
+int16_t pausetemp, pausebed, pausefan;
 
 bool liveadjust = false;
 bool bedonly = false;
@@ -519,7 +519,10 @@ void CrealityDWINClass::Draw_Status_Area(bool icons/*=false*/) {
   }
   if (current_position.z != z) {
     z = current_position.z;
-    DWIN_Draw_FloatValue(true, true, 0, DWIN_FONT_MENU, Color_White, Color_Bg_Black, 3, 2, 205, 459, current_position.z * 100);
+    if (current_position.z <= Z_MAX_POS)
+      DWIN_Draw_FloatValue(true, true, 0, DWIN_FONT_MENU, Color_White, Color_Bg_Black, 3, 2, 205, 459, current_position.z * 100);
+    else
+      DWIN_Draw_FloatValue(true, true, 0, DWIN_FONT_MENU, Color_White, Color_Bg_Black, 3, 2, 205, 459, 0);
   }
   DWIN_UpdateLCD();
 }
@@ -779,6 +782,8 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
         case MOVE_E:
           if (draw) {
             Draw_Menu_Item(row, ICON_Extruder, (char*)"Extruder");
+            current_position.e = 0;
+            sync_plan_position();
             Draw_Float(current_position.e, item);
           }
           else {
@@ -786,6 +791,8 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
               Popup_Handler(ETemp);
             }
             else {
+              current_position.e = 0;
+              sync_plan_position();
               Modify_Value(current_position.e, -500, 500, 10);
             }
           }
@@ -1896,7 +1903,9 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
       #define ADVANCED_BACK 0
       #define ADVANCED_XOFFSET (ADVANCED_BACK + ENABLED(HAS_BED_PROBE))
       #define ADVANCED_YOFFSET (ADVANCED_XOFFSET + ENABLED(HAS_BED_PROBE))
-      #define ADVANCED_TOTAL ADVANCED_YOFFSET
+      #define ADVANCED_LOAD (ADVANCED_YOFFSET + ENABLED(ADVANCED_PAUSE_FEATURE))
+      #define ADVANCED_UNLOAD (ADVANCED_LOAD + ENABLED(ADVANCED_PAUSE_FEATURE))
+      #define ADVANCED_TOTAL ADVANCED_UNLOAD
 
       switch (item) {
         case ADVANCED_BACK:
@@ -1910,20 +1919,40 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
         #if ENABLED(HAS_BED_PROBE)
         case ADVANCED_XOFFSET:
           if (draw) {
-            Draw_Menu_Item(row, ICON_SetEndTemp, (char*)"Probe X Offset");
+            Draw_Menu_Item(row, ICON_StepX, (char*)"Probe X Offset");
             Draw_Float(probe.offset.x, row, false, 10);
           }
           else {
-            Modify_Value(probe.offset.x, -50, 50, 10);
+            Modify_Value(probe.offset.x, -100, 100, 10);
           }
           break;
         case ADVANCED_YOFFSET:
           if (draw) {
-            Draw_Menu_Item(row, ICON_SetEndTemp, (char*)"Probe Y Offset");
+            Draw_Menu_Item(row, ICON_StepY, (char*)"Probe Y Offset");
             Draw_Float(probe.offset.y, row, false, 10);
           }
           else {
-            Modify_Value(probe.offset.y, -50, 50, 10);
+            Modify_Value(probe.offset.y, -100, 100, 10);
+          }
+          break;
+        #endif
+        #if ENABLED(ADVANCED_PAUSE_FEATURE)
+        case ADVANCED_LOAD:
+          if (draw) {
+            Draw_Menu_Item(row, ICON_WriteEEPROM, (char*)"Load Length");
+            Draw_Float(fc_settings[0].load_length, row, false, 1);
+          }
+          else {
+            Modify_Value(fc_settings[0].load_length, 0, EXTRUDE_MAXLENGTH, 1);
+          }
+          break;
+        case ADVANCED_UNLOAD:
+          if (draw) {
+            Draw_Menu_Item(row, ICON_ReadEEPROM, (char*)"Unload Length");
+            Draw_Float(fc_settings[0].unload_length, row, false, 1);
+          }
+          else {
+            Modify_Value(fc_settings[0].unload_length, 0, EXTRUDE_MAXLENGTH, 1);
           }
           break;
         #endif
@@ -1948,7 +1977,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
             DWIN_ICON_Show(ICON, ICON_Version, 26, MBASE(2) - 3);
             DWIN_Draw_Line(Line_Color, 16, MBASE(2) + 33, 256, MBASE(2) + 34);
 
-            DWIN_Draw_String(false, false, DWIN_FONT_MENU, Color_White, Color_Bg_Black, (DWIN_WIDTH - strlen("Build Number: " BUILD_NUMBER) * MENU_CHR_W) / 2, MBASE(3) - 1, (char*)"Build Number: " BUILD_NUMBER);
+            DWIN_Draw_String(false, false, DWIN_FONT_MENU, Color_White, Color_Bg_Black, (DWIN_WIDTH - strlen("Build Number: v" BUILD_NUMBER) * MENU_CHR_W) / 2, MBASE(3) - 1, (char*)"Build Number: v" BUILD_NUMBER);
             DWIN_ICON_Show(ICON, ICON_Version, 26, MBASE(3) - 3);
             DWIN_Draw_Line(Line_Color, 16, MBASE(3) + 33, 256, MBASE(3) + 34);
 
@@ -2342,7 +2371,7 @@ void CrealityDWINClass::Popup_Handler(uint8_t popupid, bool option/*=false*/) {
       Draw_Popup((char*)"Leveling Complete", (char*)"Save to EEPROM?", (char*)"", Popup);
       break;
     case ETemp:
-      Draw_Popup((char*)"Nozzle is too cold", (char*)"Preheat to 200C?", (char*)"", Popup, ICON_TempTooLow);
+      Draw_Popup((char*)"Nozzle is too cold", (char*)"Preheat to 200C?", (char*)"", Popup);
       break;
     case Level:
       Draw_Popup((char*)"Auto Bed Leveling", (char*)"Please wait until done.", (char*)"", Wait, ICON_AutoLeveling);
@@ -2367,7 +2396,7 @@ void CrealityDWINClass::Popup_Handler(uint8_t popupid, bool option/*=false*/) {
 
 void CrealityDWINClass::Confirm_Handler(const char * const msg) {
   last_menu = active_menu;
-  last_process = process;
+  if (process != Confirm) last_process = process;
   popup = UI;
   if (strcmp_P(msg, GET_TEXT(MSG_FILAMENT_CHANGE_INSERT)) == 0) {
     Draw_Popup((char*)"Insert Filament", (char*)"Press to Continue", (char*)"", Confirm);
@@ -2634,6 +2663,7 @@ inline void CrealityDWINClass::Print_Screen_Control() {
               gcode.process_subcommands_now_P(PSTR(cmnd));
               cmnd[sprintf(cmnd, "M109 S%i", pausetemp)] = '\0';
               gcode.process_subcommands_now_P(PSTR(cmnd));
+              thermalManager.fan_speed[0] = pausefan;
               planner.synchronize();
               queue.inject_P(PSTR("M24"));
             #endif
@@ -2688,6 +2718,7 @@ inline void CrealityDWINClass::Popup_Control() {
               queue.inject_P(PSTR("M25"));
               pausetemp = thermalManager.temp_hotend[0].target;
               pausebed = thermalManager.temp_bed.target;
+              pausefan = thermalManager.fan_speed[0];
               thermalManager.disable_all_heaters();
               thermalManager.zero_fan_speeds();
             #endif
