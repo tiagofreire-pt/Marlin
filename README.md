@@ -2,7 +2,16 @@
 
 This is my own fork, with my personal confgurations, for my own machine. Pay attention to then before using any of this code, please.
 
-BLtouch v3.1 support is active in this fork by default.
+This firmware has active support enabled by default for:
+- Creality board v4.2.2
+- Printing volume 230x230x250 mm
+- BLTouch v3.1 (Z-probe for homing + Bilinear Mesh + Delay before probing)
+- BIQU B1 all metal extruder (E-Steps)
+- Filament runout sensor
+- ARC support G-code
+- M486 G-code (skip objects)
+- M810-M819 G-codes (macros)
+
 
 <img align="right" width=175 src="buildroot/share/pixmaps/logo/marlin-250.png" />
 
