@@ -9,6 +9,7 @@ This firmware has active support enabled by default for:
 - BIQU B1 all metal extruder (E-Steps)
 - Filament runout sensor
 - ARC support G-code
+- Skew correction enabled
 - M486 G-code (skip objects)
 - M810-M819 G-codes (macros)
 - Compiling flag for performance ```-Ofast```
