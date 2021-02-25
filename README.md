@@ -1,6 +1,6 @@
 # Marlin 3D Printer Firmware - Fork from @Jyers recoded Ender 3 V2 Extended UI DWIN LCD.
 
-This is my own fork, with my personal confgurations, for my own machine. Pay attention to then before using any of this code, please.
+This is my own fork, with my personal confgurations, for my own machine. Pay attention before using any of this code, please.
 
 This firmware has active support enabled by default for:
 - Creality board v4.2.2
@@ -11,7 +11,7 @@ This firmware has active support enabled by default for:
 - ARC support G-code
 - M486 G-code (skip objects)
 - M810-M819 G-codes (macros)
-
+- Compiling flag for performance ```-Ofast```
 
 <img align="right" width=175 src="buildroot/share/pixmaps/logo/marlin-250.png" />
 
