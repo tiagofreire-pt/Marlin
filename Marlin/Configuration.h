@@ -1529,7 +1529,7 @@
  *    +-------------->X     +-------------->X     +-------------->Y
  *     XY_SKEW_FACTOR        XZ_SKEW_FACTOR        YZ_SKEW_FACTOR
  */
-//#define SKEW_CORRECTION
+#define SKEW_CORRECTION
 
 #if ENABLED(SKEW_CORRECTION)
   // Input all length measurements here:
@@ -1545,9 +1545,12 @@
   #if ENABLED(SKEW_CORRECTION_FOR_Z)
     #define XZ_DIAG_AC (140.97*2) //282.8427124746
     #define XZ_DIAG_BD (139.97*2) //282.8427124746
-    #define YZ_DIAG_AC (99.87*2) //282.8427124746
-    #define YZ_DIAG_BD () //282.8427124746
-    #define YZ_SIDE_AD () //200
+    // Additional, just for info
+    //#define XZ_SIDE_AD (99.87*2) //200
+    
+    #define YZ_DIAG_AC (140.657*2) //282.8427124746
+    #define YZ_DIAG_BD (140.17*2) //282.8427124746
+    #define YZ_SIDE_AD (99.745*2) //200
     //#define XZ_SKEW_FACTOR 0.0
     //#define YZ_SKEW_FACTOR 0.0
   #endif
