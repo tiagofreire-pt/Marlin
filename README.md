@@ -8,6 +8,7 @@ This firmware has active support enabled by default for:
 - BLTouch v3.1 (Z-probe for homing + Bilinear Mesh + Delay before probing)
 - BIQU B1 all metal extruder (E-Steps)
 - Filament runout sensor
+- Elapsed and remaining durations compliant with ISO 8601
 - ARC support G-code
 - Skew correction enabled
 - M486 G-code (skip objects)
