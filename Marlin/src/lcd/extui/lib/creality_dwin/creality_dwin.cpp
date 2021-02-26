@@ -163,6 +163,8 @@ bool bedonly = false;
 float zoffsetvalue = 0;
 uint8_t gridpoint;
 
+bool probe_deployed = false;
+
 CrealityDWINClass CrealityDWIN;
 
 /* General Display Functions */
@@ -2373,16 +2375,6 @@ char* CrealityDWINClass::Get_Menu_Title(uint8_t menu) {
       return (char*)"Info";
     case InfoMain:
       return (char*)"Info";
-    #if ENABLED(AUTO_BED_LEVELING_UBL)
-      case UBL:
-        return (char*)"Mesh Bed Leveling";
-      case MeshViewer:
-        return (char*)"Mesh Viewer";
-      case UBLManual:
-        return (char*)"Manual tuning";
-      case UBLHelp:
-        return (char*)"UBL manual levelling tutorial";
-    #endif
     #if ENABLED(PROBE_MANUALLY)
       case ManualMesh:
         return (char*)"Mesh Bed Leveling";
@@ -2458,16 +2450,6 @@ int CrealityDWINClass::Get_Menu_Size(uint8_t menu) {
     #if ENABLED(PROBE_MANUALLY)
       case ManualMesh:
         return MMESH_TOTAL;
-    #endif
-    #if ENABLED(AUTO_BED_LEVELING_UBL)
-      case UBL:
-        return UBL_TOTAL;
-      case MeshViewer:
-        return MESHVIEW_TOTAL;
-      case UBLManual:
-        return UBLM_TOTAL - !ubl_conf.goto_mesh_value;
-      case UBLHelp:
-        return UBLH_TOTAL;
     #endif
     case Tune:
       return TUNE_TOTAL;
