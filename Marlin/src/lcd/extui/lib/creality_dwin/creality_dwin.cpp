@@ -200,8 +200,13 @@ inline void CrealityDWINClass::Draw_Title(char *title) {
   DWIN_Draw_String(false, false, DWIN_FONT_HEAD, Color_White, Color_Bg_Blue, (DWIN_WIDTH - strlen(title) * STAT_CHR_W) / 2, 4, title);
 }
 
-inline void CrealityDWINClass::Draw_Menu_Item(uint8_t row, uint8_t icon/*=0*/, char *label, bool more/*=false*/, uint8_t custom_disabled_icon/*=ICON_Version*/) {
-  if (label) DWIN_Draw_String(false, false, DWIN_FONT_MENU, Color_White, Color_Bg_Black, LBLX, MBASE(row) - 1, label); // Draw Label
+inline void CrealityDWINClass::Draw_Menu_Item(uint8_t row, uint8_t icon/*=0*/, char *label1, char *label2, bool more/*=false*/, bool centered/*=false*/, uint8_t custom_disabled_icon/*=ICON_Version*/) {
+  const uint8_t label_offset_y = !(label1 && label2) ? 0 : MENU_CHR_H * 3 / 5;
+  const uint8_t label1_offset_x = !centered ? LBLX : LBLX * 4/5 + max(LBLX * 1U/5, (DWIN_WIDTH - LBLX - strlen(label1) * MENU_CHR_W) / 2);
+  const uint8_t label2_offset_x = !centered ? LBLX : LBLX * 4/5 + max(LBLX * 1U/5, (DWIN_WIDTH - LBLX - strlen(label2) * MENU_CHR_W) / 2);
+  if (label1) DWIN_Draw_String(false, false, DWIN_FONT_MENU, Color_White, Color_Bg_Black, label1_offset_x, MBASE(row) - 1 - label_offset_y, label1); // Draw Label
+  if (label2) DWIN_Draw_String(false, false, DWIN_FONT_MENU, Color_White, Color_Bg_Black, label2_offset_x, MBASE(row) - 1 + label_offset_y, label2); // Draw Label
+  
   if (icon) {
     if (DISABLED(CREALITY_DWIN_EXTUI_CUSTOM_ICONS) && icon >= CUSTOM_ICON_START) 
       DWIN_ICON_Show(ICON, custom_disabled_icon, 26, MBASE(row) - 3); //Draw Fallback Menu Icon
@@ -678,7 +683,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           break;
         case PREPARE_MOVE:
           if (draw) {
-            Draw_Menu_Item(row, ICON_Axis, (char*)"Move", true);
+            Draw_Menu_Item(row, ICON_Axis, (char*)"Move", NULL, true);
           }
           else {
             Draw_Menu(Move);
@@ -711,7 +716,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           break;
         case PREPARE_MANUALLEVEL:
           if (draw) {
-            Draw_Menu_Item(row, ICON_PrintSize, (char*)"Manual Leveling", true);
+            Draw_Menu_Item(row, ICON_PrintSize, (char*)"Manual Leveling", NULL, true);
           }
           else {
             Popup_Handler(Home);
@@ -723,7 +728,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
         #if HAS_ZOFFSET_ITEM
         case PREPARE_ZOFFSET:
           if (draw) {
-            Draw_Menu_Item(row, ICON_Zoffset, (char*)"Z-Offset", true);
+            Draw_Menu_Item(row, ICON_Zoffset, (char*)"Z-Offset", NULL, true);
           }
           else {
             Draw_Menu(ZOffset);
@@ -733,7 +738,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
         #if HAS_PREHEAT
         case PREPARE_PREHEAT:
           if (draw) {
-            Draw_Menu_Item(row, ICON_Temperature, (char*)"Preheat", true);
+            Draw_Menu_Item(row, ICON_Temperature, (char*)"Preheat", NULL, true);
           }
           else {
             Draw_Menu(Preheat);
@@ -753,7 +758,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
         case PREPARE_CHANGEFIL:
           if (draw) {
             #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
-              Draw_Menu_Item(row, ICON_ResumeEEPROM, (char*)"Change Filament", true);
+              Draw_Menu_Item(row, ICON_ResumeEEPROM, (char*)"Change Filament", NULL, true);
             #else
               Draw_Menu_Item(row, ICON_ResumeEEPROM, (char*)"Change Filament");
             #endif
@@ -1220,7 +1225,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           break;
         case CONTROL_TEMP:
           if (draw) {
-            Draw_Menu_Item(row, ICON_Temperature, (char*)"Temperature", true);
+            Draw_Menu_Item(row, ICON_Temperature, (char*)"Temperature", NULL, true);
           }
           else {
             Draw_Menu(TempMenu);
@@ -1228,7 +1233,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           break;
         case CONTROL_MOTION:
           if (draw) {
-            Draw_Menu_Item(row, ICON_Motion, (char*)"Motion", true);
+            Draw_Menu_Item(row, ICON_Motion, (char*)"Motion", NULL, true);
           }
           else {
             Draw_Menu(Motion);
@@ -1236,7 +1241,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           break;
         case CONTROL_ADVANCED:
           if (draw) {
-            Draw_Menu_Item(row, ICON_Version, (char*)"Advanced", true);
+            Draw_Menu_Item(row, ICON_Version, (char*)"Advanced", NULL, true);
           }
           else {
             Draw_Menu(Advanced);
@@ -2055,39 +2060,23 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
             
             #define INFO_OFFSET (ENABLED(PRINTCOUNTER) * 2)
             #if ENABLED(PRINTCOUNTER)
-              char buf[32];
-              char buf2[32];
+              char row1[32], row2[32], buf[32];
               printStatistics ps = print_job_timer.getStats();
 
-              sprintf(buf, "%i prints, %i finished", ps.totalPrints, ps.finishedPrints);
-              DWIN_Draw_String(false, false, DWIN_FONT_MENU, Color_White, Color_Bg_Black, LBLX, MBASE(1) - 1 - MENU_CHR_H * 3 / 5, (char*)buf);
-              sprintf(buf, "%.2f m filament used", ps.filamentUsed / 1000);
-              DWIN_Draw_String(false, false, DWIN_FONT_MENU, Color_White, Color_Bg_Black, LBLX, MBASE(1) - 1 + MENU_CHR_H * 3 / 5, (char*)buf);
-              DWIN_ICON_Show(ICON, ICON_HotendTemp, 26, MBASE(1) - 3);
-              DWIN_Draw_Line(Line_Color, 16, MBASE(1) + 33, 256, MBASE(1) + 34);
+              sprintf(row1, "%i prints, %i finished", ps.totalPrints, ps.finishedPrints);
+              sprintf(row2, "%.2f m filament used", ps.filamentUsed / 1000);
+              Draw_Menu_Item(1, ICON_HotendTemp, row1, row2, false, true);
 
-              ExtUI::getTotalPrintTime_str(buf2);
-              sprintf(buf, "Print time: %s", buf2);
-              DWIN_Draw_String(false, false, DWIN_FONT_MENU, Color_White, Color_Bg_Black, LBLX, MBASE(2) - 1 - MENU_CHR_H * 3 / 5, (char*)buf);
-              ExtUI::getLongestPrint_str(buf2);
-              sprintf(buf, "Longest print: %s", buf2);
-              DWIN_Draw_String(false, false, DWIN_FONT_MENU, Color_White, Color_Bg_Black, LBLX, MBASE(2) - 1 + MENU_CHR_H * 3 / 5, (char*)buf);
-              DWIN_ICON_Show(ICON, ICON_PrintTime, 26, MBASE(2) - 3);
-              DWIN_Draw_Line(Line_Color, 16, MBASE(2) + 33, 256, MBASE(2) + 34);
+              ExtUI::getTotalPrintTime_str(buf);
+              sprintf(row1, "Printed: %s", buf);
+              ExtUI::getLongestPrint_str(buf);
+              sprintf(row2, "Longest: %s", buf);
+              Draw_Menu_Item(2, ICON_PrintTime, row1, row2, false, true);
             #endif
             
-            DWIN_Draw_String(false, false, DWIN_FONT_MENU, Color_White, Color_Bg_Black, (DWIN_WIDTH - strlen(MACHINE_SIZE) * MENU_CHR_W) / 2, MBASE(INFO_OFFSET + 1) - 1, (char*)MACHINE_SIZE);
-            DWIN_ICON_Show(ICON, ICON_PrintSize, 26, MBASE(INFO_OFFSET + 1) - 3);
-            DWIN_Draw_Line(Line_Color, 16, MBASE(INFO_OFFSET + 1) + 33, 256, MBASE(INFO_OFFSET + 1) + 34);
-
-            DWIN_Draw_String(false, false, DWIN_FONT_MENU, Color_White, Color_Bg_Black, (DWIN_WIDTH - strlen(SHORT_BUILD_VERSION) * MENU_CHR_W) / 2, MBASE(INFO_OFFSET + 2) - 1 - MENU_CHR_H * 3 / 5, (char*)SHORT_BUILD_VERSION);
-            DWIN_Draw_String(false, false, DWIN_FONT_MENU, Color_White, Color_Bg_Black, (DWIN_WIDTH - strlen("Build Number: v" BUILD_NUMBER) * MENU_CHR_W) / 2, MBASE(INFO_OFFSET + 2) - 1 + MENU_CHR_H * 3 / 5, (char*)"Build Number: v" BUILD_NUMBER);
-            DWIN_ICON_Show(ICON, ICON_Version, 26, MBASE(INFO_OFFSET + 2) - 3);
-            DWIN_Draw_Line(Line_Color, 16, MBASE(INFO_OFFSET + 2) + 33, 256, MBASE(INFO_OFFSET + 2) + 34);
-
-            DWIN_Draw_String(false, false, DWIN_FONT_MENU, Color_White, Color_Bg_Black, (DWIN_WIDTH - strlen(CORP_WEBSITE_E) * MENU_CHR_W) / 2, MBASE(INFO_OFFSET + 3) - 1, (char*)CORP_WEBSITE_E);
-            DWIN_ICON_Show(ICON, ICON_Contact, 26, MBASE(INFO_OFFSET + 3) - 3);
-            DWIN_Draw_Line(Line_Color, 16, MBASE(INFO_OFFSET + 3) + 33, 256, MBASE(INFO_OFFSET + 3) + 34);
+            Draw_Menu_Item(3, ICON_PrintSize, (char*)MACHINE_SIZE, NULL, false, true);
+            Draw_Menu_Item(4, ICON_Version, (char*)SHORT_BUILD_VERSION, (char*)"Build Number: v" BUILD_NUMBER, false, true);
+            Draw_Menu_Item(5, ICON_Contact, (char*)CORP_WEBSITE_E, NULL, false, true);
           }
           else {
             if (menu == Info)
