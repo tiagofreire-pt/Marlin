@@ -291,7 +291,7 @@
     
     if (finish_incremental_LSF(&lsf_results)) {
       SERIAL_ECHOPGM("Could not complete LSF!");
-      return;
+      return true;
     }
 
     set_all_mesh_points_to_value(0);
@@ -327,6 +327,7 @@
       z_values[i][j] = mz - lsf_results.D;
       TERN_(EXTENSIBLE_UI, ExtUI::onMeshUpdate(i, j, z_values[i][j]));
     }
+    return false;
   }
 
 #endif // AUTO_BED_LEVELING_UBL

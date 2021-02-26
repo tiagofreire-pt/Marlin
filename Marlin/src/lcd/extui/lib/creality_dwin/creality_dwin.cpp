@@ -2287,7 +2287,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
             if (draw) {
               Draw_Menu_Item(row, ICON_ResumeEEPROM, (char*)"Create Plane (>2 points)");
             } else {
-              if (!ubl.create_plane_from_mesh()) {
+              if (ubl.create_plane_from_mesh()) {
                 Confirm_Handler((char*)"Error: Couldn't create plane!");
                 break;
               }
