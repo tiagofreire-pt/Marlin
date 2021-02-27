@@ -11,16 +11,20 @@ This firmware has active support enabled by default for:
 - Elapsed and remaining durations compliant with ISO 8601
 - ARC support G-code
 - Skew correction enabled
+- Emergency Parser
+- Service interval watchdogs
+- G6 G-code (Direct Stepping - https://github.com/colinrgodsey/step-daemon)
 - M486 G-code (skip objects)
 - M810-M819 G-codes (macros)
+- M575 G-code (Baud rate)
 - M281 C-code support (servo angles)
 - Compiling flag for performance ```-Ofast```
 
 <img align="right" width=175 src="buildroot/share/pixmaps/logo/marlin-250.png" />
 
-Additional documentation can be found at the [Marlin Home Page](https://marlinfw.org/).
-
 ## Marlin 2.0 Bugfix Branch
+
+Additional documentation can be found at the [Marlin Home Page](https://marlinfw.org/).
 
 ## Credits
 
