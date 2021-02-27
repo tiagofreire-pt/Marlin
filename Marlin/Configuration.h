@@ -1548,7 +1548,7 @@
     // Additional, just for info
     //#define XZ_SIDE_AD (99.87*2) //200
     
-    #define YZ_DIAG_AC (140.657*2) //282.8427124746
+    #define YZ_DIAG_AC (140.65*2) //282.8427124746
     #define YZ_DIAG_BD (140.17*2) //282.8427124746
     #define YZ_SIDE_AD (99.745*2) //200
     //#define XZ_SKEW_FACTOR 0.0
