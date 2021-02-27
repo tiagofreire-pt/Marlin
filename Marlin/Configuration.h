@@ -1413,7 +1413,9 @@
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
   #define UBL_MESH_EDIT_MOVES_Z     // Sophisticated users prefer no movement of nozzle
-  #define UBL_SAVE_ACTIVE_ON_M500   // Save the currently active mesh in the current slot on M500
+  //#define UBL_SAVE_ACTIVE_ON_M500   // Save the currently active mesh in the current slot on M500
+  //  !NB! Do not uncomment UBL_SAVE_ACTIVE_ON_M500 otherwise using the tilt command 'G29 J' 
+  //  (e.g. from the auto-level menu item) can end up overwriting your original mesh with a tilted one!
 
   //#define UBL_Z_RAISE_WHEN_OFF_MESH 2.5 // When the nozzle is off the mesh, this value is used
                                           // as the Z-Height correction value.
@@ -1753,7 +1755,7 @@
  *
  * View the current statistics with M78.
  */
-//#define PRINTCOUNTER
+#define PRINTCOUNTER
 
 /**
  * Password
@@ -2283,6 +2285,13 @@
 // Ender-3 v2 OEM display. A DWIN display with Rotary Encoder.
 //
 #define CREALITY_DWIN_EXTUI
+#if ENABLED(CREALITY_DWIN_EXTUI)
+  //
+  // Enable custom icons
+  // NB: Requires Ender-3 v2 OEM display firmware update, or you will get blank icons!
+  //
+  #define CREALITY_DWIN_EXTUI_CUSTOM_ICONS
+#endif
 
 //
 // Touch-screen LCD for Malyan M200/M300 printers
@@ -2611,4 +2620,4 @@
 //#define DEACTIVATE_SERVOS_AFTER_MOVE
 
 // Edit servo angles with M281 and save to EEPROM with M500
-//#define EDITABLE_SERVO_ANGLES
+#define EDITABLE_SERVO_ANGLES
