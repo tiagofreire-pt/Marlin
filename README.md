@@ -13,6 +13,7 @@ This firmware has active support enabled by default for:
 - Skew correction enabled
 - M486 G-code (skip objects)
 - M810-M819 G-codes (macros)
+- M281 C-code support (servo angles)
 - Compiling flag for performance ```-Ofast```
 
 <img align="right" width=175 src="buildroot/share/pixmaps/logo/marlin-250.png" />
